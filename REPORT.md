@@ -99,7 +99,7 @@ int main() {
 }
 EOF
 ```
-# Создаём CMakeLists.txt
+### Создаём CMakeLists.txt
 ```
 $ cat > hello_world/CMakeLists.txt << 'EOF'
 cmake_minimum_required(VERSION 3.4)
