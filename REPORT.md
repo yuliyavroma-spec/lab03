@@ -86,7 +86,7 @@ EOF
 ### Создаём директорию
 ```
 $ mkdir -p hello_world
-
+```
 ### Создаём hello_world.cpp
 ```
 $ cat > hello_world/hello_world.cpp << 'EOF'
