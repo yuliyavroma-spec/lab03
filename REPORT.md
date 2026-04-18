@@ -1,292 +1,159 @@
-## Laboratory work II
+## Laboratory work III
 
-Данная лабораторная работа посвещена изучению систем контроля версий на примере **Git**.
-
-```bash
-$ open https://git-scm.com
-```
-
-## Tasks
-
-- [ ] 1. Создать публичный репозиторий с названием **lab02** и с лиценцией **MIT**
-- [ ] 2. Сгенирировать токен для доступа к сервису **GitHub** с правами **repo**
-- [ ] 3. Ознакомиться со ссылками учебного материала
-- [ ] 4. Выполнить инструкцию учебного материала
-- [ ] 5. Составить отчет и отправить ссылку личным сообщением в **Slack**
-
-## Tutorial
+Данная лабораторная работа посвещена изучению систем автоматизации сборки проекта на примере **CMake**
 
 ```sh
-$ export GITHUB_USERNAME=<имя_пользователя>
-$ export GITHUB_EMAIL=<адрес_почтового_ящика>
-$ export GITHUB_TOKEN=<сгенирированный_токен>
-$ alias edit=<nano|vi|vim|subl>
+$ open https://cmake.org/
 ```
-
-```sh
-$ cd ${GITHUB_USERNAME}/workspace
-$ source scripts/activate
-```
-
-```sh
-$ mkdir ~/.config
-$ cat > ~/.config/hub <<EOF
-github.com:
-- user: ${GITHUB_USERNAME}
-  oauth_token: ${GITHUB_TOKEN}
-  protocol: https
-EOF
-$ git config --global hub.protocol https
-```
-
-```sh
-$ mkdir projects/lab02 && cd projects/lab02
-$ git init
-$ git config --global user.name ${GITHUB_USERNAME}
-$ git config --global user.email ${GITHUB_EMAIL}
-# check your git global settings
-$ git config -e --global
-$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab02.git
-$ git pull origin master
-$ touch README.md
-$ git status
-$ git add README.md
-$ git commit -m"added README.md"
-$ git push origin master
-```
-
-Добавить на сервисе **GitHub** в репозитории **lab02** файл **.gitignore**
-со следующем содержимом:
-
-```sh
-*build*/
-*install*/
-*.swp
-.idea/
-```
-
-```sh
-$ git pull origin master
-$ git log
-```
-
-```sh
-$ mkdir sources
-$ mkdir include
-$ mkdir examples
-$ cat > sources/print.cpp <<EOF
-#include <print.hpp>
-
-void print(const std::string& text, std::ostream& out)
-{
-  out << text;
-}
-
-void print(const std::string& text, std::ofstream& out)
-{
-  out << text;
-}
-EOF
-```
-
-```sh
-$ cat > include/print.hpp <<EOF
-#include <fstream>
-#include <iostream>
-#include <string>
-
-void print(const std::string& text, std::ofstream& out);
-void print(const std::string& text, std::ostream& out = std::cout);
-EOF
-```
-
-```sh
-$ cat > examples/example1.cpp <<EOF
-#include <print.hpp>
-
-int main(int argc, char** argv)
-{
-  print("hello");
-}
-EOF
-```
-
-```sh
-$ cat > examples/example2.cpp <<EOF
-#include <print.hpp>
-
-#include <fstream>
-
-int main(int argc, char** argv)
-{
-  std::ofstream file("log.txt");
-  print(std::string("hello"), file);
-}
-EOF
-```
-
-```sh
-$ edit README.md
-```
-
-```sh
-$ git status
-$ git add .
-$ git commit -m"added sources"
-$ git push origin master
-```
-
 ## Report
+Представьте, что вы стажер в компании "Formatter Inc.".
 
-```sh
-$ cd ~/workspace/
-$ export LAB_NUMBER=02
-$ git clone https://github.com/tp-labs/lab${LAB_NUMBER}.git tasks/lab${LAB_NUMBER}
-$ mkdir reports/lab${LAB_NUMBER}
-$ cp tasks/lab${LAB_NUMBER}/README.md reports/lab${LAB_NUMBER}/REPORT.md
-$ cd reports/lab${LAB_NUMBER}
-$ edit REPORT.md
-$ gist REPORT.md
+### Задание 1
+Вам поручили перейти на систему автоматизированной сборки **CMake**.
+Исходные файлы находятся в директории [formatter_lib](formatter_lib).
+В этой директории находятся файлы для статической библиотеки *formatter*.
+Создайте `CMakeList.txt` в директории [formatter_lib](formatter_lib),
+с помощью которого можно будет собирать статическую библиотеку *formatter*.
 ```
+$ cat > formatter_lib/CMakeLists.txt << 'EOF'
+cmake_minimum_required(VERSION 3.4)
+project(formatter)
 
-## Homework
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-### Part I
-
-1. Создайте пустой репозиторий на сервисе github.com (или gitlab.com, или bitbucket.com).
-``` $ git checkout -b patch1
-Переключились на новую ветку «patch1»
+add_library(formatter STATIC ${CMAKE_CURRENT_SOURCE_DIR}/formatter.cpp)
+target_include_directories(formatter PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+EOF
 ```
-2. Выполните инструкцию по созданию первого коммита на странице репозитория, созданного на предыдещем шаге.
-3. Создайте файл `hello_world.cpp` в локальной копии репозитория (который должен был появиться на шаге 2). Реализуйте программу **Hello world** на языке C++ используя плохой стиль кода. Например, после заголовочных файлов вставьте строку `using namespace std;`.
-```cpp
- #include <iostream>
- using namespace std;
+### Задание 2
+У компании "Formatter Inc." есть перспективная библиотека,
+которая является расширением предыдущей библиотеки. Т.к. вы уже овладели
+навыком созданием `CMakeList.txt` для статической библиотеки *formatter*, ваш 
+руководитель поручает заняться созданием `CMakeList.txt` для библиотеки 
+*formatter_ex*, которая в свою очередь использует библиотеку *formatter*.
 
- int main() {
-    cout << "Hello world" << endl;
-    return 0;
-}```
-4. Добавьте этот файл в локальную копию репозитория.
-5. Закоммитьте изменения с *осмысленным* сообщением.
-6. Изменитьте исходный код так, чтобы программа через стандартный поток ввода запрашивалось имя пользователя. А в стандартный поток вывода печаталось сообщение `Hello world from @name`, где `@name` имя пользователя.
-```cpp
- #include <iostream>
- #include <string>
- using namespace std;
+```
+$ mkdir -p formatter_ex
+```
+### Создаём formatter_ex.h
+```
+$ cat > formatter_ex/formatter_ex.h << 'EOF'
 
- int main() {
-    string name;
-    cout << "Enter your name: ";
-    cin >> name;
-    cout << "Hello world from @" << name << endl;
-    return 0;
- }```
-7. Закоммитьте новую версию программы. Почему не надо добавлять файл повторно `git add`?
-**Ответ:** флаг `-а` автоматически добавляет все изменённые отслеживаемые файлы.
-8. Запуште изменения в удалёный репозиторий.
-9. Проверьте, что история коммитов доступна в удалёный репозитории.
-
-### Part II
-
-**Note:** *Работать продолжайте с теми же репоззиториями, что и в первой части задания.*
-1. В локальной копии репозитория создайте локальную ветку `patch1`.
-2. Внесите изменения в ветке `patch1` по исправлению кода и избавления от `using namespace std;`.
-```cpp
- #include <iostream>
+ #pragma once
  #include <string>
 
- int main() {
-    std::string name;
-    std::cout << "Enter your name: ";
-    std::cin >> name;
-    std::cout << "Hello world from @" << name << std::endl;
-    return 0;
- }```
-3. **commit**, **push** локальную ветку в удалённый репозиторий.
-4. Проверьте, что ветка `patch1` доступна в удалёный репозитории.
-5. Создайте pull-request `patch1 -> master`.
-6. В локальной копии в ветке `patch1` добавьте в исходный код комментарии.
-```cpp
- #include <iostream>  // for std::cout, std::cin
-#include <string>    // for std::string
+std::string formatter_ex(const std::string& message);
+EOF
+```
+### Создаём formatter_ex.cpp
+```
+$ cat > formatter_ex/formatter_ex.cpp << 'EOF'
 
-// Main function
+ #include "formatter_ex.h"
+ #include "formatter.h"
+
+std::string formatter_ex(const std::string& message) {
+    return ">>> " + formatter(message) + " <<<";
+}
+EOF
+```
+### Создаём CMakeLists.txt
+```
+$ cat > formatter_ex/CMakeLists.txt << 'EOF'
+cmake_minimum_required(VERSION 3.4)
+project(formatter_ex)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_library(formatter_ex STATIC ${CMAKE_CURRENT_SOURCE_DIR}/formatter_ex.cpp)
+target_include_directories(formatter_ex PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../formatter_lib
+)
+target_link_libraries(formatter_ex formatter)
+EOF
+```
+
+### Задание 3
+Конечно же ваша компания предоставляет примеры использования своих библиотек.
+Чтобы продемонстрировать как работать с библиотекой *formatter_ex*,
+вам необходимо создать два `CMakeList.txt` для двух простых приложений:
+* *hello_world*, которое использует библиотеку *formatter_ex*;
+* *solver*, приложение которое испольует статические библиотеки *formatter_ex* и *solver_lib*.
+
+### Создаём директорию
+```
+$ mkdir -p hello_world
+
+### Создаём hello_world.cpp
+```
+$ cat > hello_world/hello_world.cpp << 'EOF'
+ #include "formatter_ex.h"
+ #include <iostream>
+
 int main() {
-    std::string name;  // variable to store the name
-    std::cout << "Enter your name: ";  // prompt for name
-    std::cin >> name;  // read the name
-    std::cout << "Hello world from @" << name << std::endl;  // print greeting
-    return 0;  // successful completion
-}```
-7. **commit**, **push**.
-8. Проверьте, что новые изменения есть в созданном на **шаге 5** pull-request
-9. В удалённый репозитории выполните  слияние PR `patch1 -> master` и удалите ветку `patch1` в удаленном репозитории.
-10. Локально выполните **pull**.
-11. С помощью команды **git log** просмотрите историю в локальной версии ветки `master`.
-```shell
-$ git log --oneline
-
-3f43849 (HEAD -> master, origin/master) Merge pull request #2 from yuliyavroma-spec/patch2
-4f8bccd (origin/patch2) apply clang-format with Mozilla style
-6fc4d8a Merge pull request #1 from yuliyavroma-spec/patch1
-3cdfdd6 (origin/patch1) fix: remove using namespace std
-8d15061 add name input to hello_world
-a6c8bdd add hello_world.cpp
-8a57adf added sources
-380e17c initial commit```
-
-12. Удалите локальную ветку `patch1`.
-
-### Part III
-
-**Note:** *Работать продолжайте с теми же репоззиториями, что и в первой части задания.*
-1. Создайте новую локальную ветку `patch2`.
-```$ git checkout -b patch2
-Переключились на новую ветку «patch2»```
-
-2. Измените *code style* с помощью утилиты [**clang-format**](http://clang.llvm.org/docs/ClangFormat.html). Например, используя опцию `-style=Mozilla`.
-```cpp
- #include <iostream>
- #include <string>
-
- int
- main()
- {
-    std::string name;
-    std::cout << "Enter your name: ";
-    std::cin >> name;
-    std::cout << "Hello world from @" << name << std::endl;
+    std::cout << formatter_ex("Hello, World!") << std::endl;
     return 0;
- }```
-3. **commit**, **push**, создайте pull-request `patch2 -> master`.
-4. В ветке **master** в удаленном репозитории измените комментарии, например, расставьте знаки препинания, переведите комментарии на другой язык.
-```cpp
- #include <iostream>  // для ввода/вывода
- #include <string>    // для строк
-
- // главная функция программы
- int main() {
-    std::string name;  // имя пользователя
-    std::cout << "Enter your name: ";  // запрос имени
-    std::cin >> name;
-    std::cout << "Hello world from @" << name << std::endl;
-    return 0;
- }```
-5. Убедитесь, что в pull-request появились *конфликтны*.
-6. Для этого локально выполните **pull** + **rebase** (точную последовательность команд, следует узнать самостоятельно). **Исправьте конфликты**.
-7. Сделайте *force push* в ветку `patch2`
-8. Убедитель, что в pull-request пропали конфликтны. 
-9. Вмержите pull-request `patch2 -> master`.
-
-## Links
-
-- [hub](https://hub.github.com/)
-- [GitHub](https://github.com)
-- [Bitbucket](https://bitbucket.org)
-- [Gitlab](https://about.gitlab.com)
-- [LearnGitBranching](http://learngitbranching.js.org/)
-
+}
+EOF
 ```
-Copyright (c) 2015-2021 The ISC Authors
+# Создаём CMakeLists.txt
+```
+$ cat > hello_world/CMakeLists.txt << 'EOF'
+cmake_minimum_required(VERSION 3.4)
+project(hello_world)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_executable(hello_world ${CMAKE_CURRENT_SOURCE_DIR}/hello_world.cpp)
+target_include_directories(hello_world PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../formatter_ex
+    ${CMAKE_CURRENT_SOURCE_DIR}/../formatter_lib
+)
+target_link_libraries(hello_world formatter_ex formatter)
+EOF
+```
+### Сборка проекта
+```
+$ cmake .. && cmake --build .
+CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- The C compiler identification is GNU 14.2.0
+-- The CXX compiler identification is GNU 14.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.6s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/yulia/yuliyavroma-spec/workspace/projects/lab03/solver/build
+[ 20%] Building CXX object CMakeFiles/solver.dir/solver.cpp.o
+[ 40%] Building CXX object CMakeFiles/solver.dir/home/yulia/yuliyavroma-spec/workspace/projects/lab03/formatter_ex/formatter_ex.cpp.o
+[ 60%] Building CXX object CMakeFiles/solver.dir/home/yulia/yuliyavroma-spec/workspace/projects/lab03/formatter_lib/formatter.cpp.o
+[ 80%] Building CXX object CMakeFiles/solver.dir/home/yulia/yuliyavroma-spec/workspace/projects/lab03/solver_lib/solver.cpp.o
+[100%] Linking CXX executable solver
+[100%] Built target solver
+```
+### Запуск приложения
+```
+$ ./solver
+---
+x1 = 1.000000, x2 = 2.000000
+---
 ```
